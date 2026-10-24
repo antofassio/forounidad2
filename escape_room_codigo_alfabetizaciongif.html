@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Escape Room Virtual: El Código de la Alfabetización</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap');
+:root{--navy:#071c3a;--blue:#123f68;--cream:#fff1d3;--gold:#ffc857;--sky:#7bc9e8;--ink:#10253d;--pixel:4px}
+*{box-sizing:border-box}
+body{margin:0;background:#071326;color:var(--cream);font-family:'VT323',monospace;font-size:23px;line-height:1.15}
+button{font:inherit;cursor:pointer}
+.shell{max-width:980px;margin:0 auto;padding:18px}
+header{border:4px solid #4c9ac4;background:linear-gradient(180deg,#154b79,#071c3a);padding:22px;text-align:center;box-shadow:8px 8px 0 #020a17}
+.kicker{font-family:'Press Start 2P',monospace;font-size:10px;color:var(--gold);line-height:1.8}
+h1{font-family:'Press Start 2P',monospace;font-size:clamp(18px,3vw,28px);line-height:1.6;margin:12px 0;color:#fff0bf}
+.subtitle{font-size:26px}
+.pixel{font-family:'Press Start 2P',monospace;font-size:10px;line-height:1.8}
+.panel{display:none;margin-top:20px;background:var(--cream);color:var(--ink);border:5px solid #4c9ac4;box-shadow:8px 8px 0 #020a17;padding:clamp(16px,3vw,28px)}
+.panel.active{display:block}
+h2{font-family:'Press Start 2P',monospace;font-size:15px;line-height:1.8;color:#103c65;margin:0 0 16px}
+h3{font-family:'Press Start 2P',monospace;font-size:11px;line-height:1.8;color:#103c65}
+.story{white-space:pre-line}
+.scene{display:grid;grid-template-columns:130px 1fr;gap:18px;align-items:center;background:#d6e9ee;border:3px solid #173d60;padding:14px;margin:16px 0}
+.sprite{font-size:68px;text-align:center;image-rendering:pixelated;filter:drop-shadow(3px 3px 0 #7894a2)}
+.speech{background:#fff;border:3px solid #173d60;padding:13px;position:relative}
+.speech:before{content:"";position:absolute;left:-12px;top:24px;border-top:8px solid transparent;border-bottom:8px solid transparent;border-right:12px solid #173d60}
+.dilemma{background:#dce9f3;border-left:6px solid #e3a62f;padding:12px;margin:14px 0}
+.choices{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
+.choice{border:3px solid #173d60;background:#d8eafa;color:#10253d;padding:16px;text-align:left;box-shadow:4px 4px 0 #173d60;transition:transform .1s}
+.choice:hover,.choice:focus{transform:translate(-2px,-2px);background:#fff0b9}
+.choice strong{display:block;font-family:'Press Start 2P',monospace;font-size:10px;line-height:1.8;margin-bottom:8px}
+.btn{border:3px solid #ffc857;background:#123f68;color:#fff1d3;padding:12px 18px;box-shadow:4px 4px 0 #071326}
+.btn:hover{background:#205c8d}
+.actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:20px}
+.feedback{display:none;margin-top:16px;padding:14px;border:3px dashed #1b6a58;background:#e1f5dc}
+.feedback.show{display:block}
+.progress{display:flex;gap:8px;margin:18px 0}
+.dot{flex:1;height:10px;background:#27435b;border:2px solid #6ba4c3}
+.dot.done{background:var(--gold)}
+footer{text-align:center;color:#a8c8da;padding:22px 5px;font-size:20px}
+.small{font-size:19px}
+@media(max-width:620px){.choices{grid-template-columns:1fr}.scene{grid-template-columns:1fr}.sprite{font-size:54px}.speech:before{display:none}.shell{padding:10px}h2{font-size:12px}}
+
+/* Ilustraciones pixel-art integradas: no dependen de imágenes externas */
+.sprite{font-size:0!important;min-height:118px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;background:#b8d9e7;border:3px solid #173d60}
+.pixel-person{width:48px;height:88px;position:relative;image-rendering:pixelated}
+.pixel-person .hair{position:absolute;left:12px;top:0;width:28px;height:12px;background:#55331f;box-shadow:-4px 8px #55331f,0 12px #55331f,8px 12px #55331f}
+.pixel-person .head{position:absolute;left:12px;top:12px;width:28px;height:24px;background:#e8b27e;box-shadow:4px 0 #e8b27e}
+.pixel-person .eye{position:absolute;left:31px;top:22px;width:4px;height:4px;background:#17283a;z-index:2}
+.pixel-person .body{position:absolute;left:8px;top:36px;width:36px;height:28px;background:#8b5a36;box-shadow:0 4px #8b5a36}
+.pixel-person .arm{position:absolute;left:0;top:39px;width:8px;height:25px;background:#e8b27e;box-shadow:40px 0 #e8b27e}
+.pixel-person .leg{position:absolute;left:12px;top:64px;width:10px;height:20px;background:#34445a;box-shadow:16px 0 #34445a}
+.pixel-person.book .body{background:#2c6a91}.pixel-person.book:after{content:"";position:absolute;left:28px;top:44px;width:18px;height:14px;background:#fff0b9;border:3px solid #c58c35}
+.pixel-official{width:58px;height:88px;position:relative}
+.pixel-official .hat{position:absolute;left:8px;top:0;width:42px;height:8px;background:#17283a;box-shadow:8px 8px #17283a,-4px 8px #17283a}
+.pixel-official .head{position:absolute;left:16px;top:12px;width:28px;height:22px;background:#e8b27e}
+.pixel-official .moustache{position:absolute;left:18px;top:27px;width:24px;height:5px;background:#493023;z-index:2}
+.pixel-official .coat{position:absolute;left:9px;top:34px;width:44px;height:38px;background:#17283a;clip-path:polygon(20% 0,80% 0,100% 100%,0 100%)}
+.pixel-official .tie{position:absolute;left:28px;top:36px;width:5px;height:24px;background:#c68b35;z-index:2}
+.pixel-official .legs{position:absolute;left:15px;top:71px;width:10px;height:15px;background:#17283a;box-shadow:19px 0 #17283a}
+.school-art{width:100%;height:118px;display:flex;align-items:flex-end;justify-content:center;position:relative;background:linear-gradient(#8ed3ef 0 65%,#7da36a 65%);overflow:hidden}
+.school-art .building{width:72%;height:70px;background:#e9d6ae;border:4px solid #8c6844;position:relative;box-shadow:0 -14px #b85f3e}
+.school-art .building:before{content:"";position:absolute;left:-8px;top:-20px;width:calc(100% + 16px);height:20px;background:#a74e37;clip-path:polygon(0 100%,50% 0,100% 100%)}
+.school-art .door{position:absolute;left:45%;bottom:0;width:22px;height:40px;background:#5b3c2d;border:3px solid #fff0b9}
+.school-art .window{position:absolute;top:18px;left:14%;width:20px;height:20px;background:#86c9e4;border:3px solid #8c6844;box-shadow:92px 0 #86c9e4}
+.school-art .label{position:absolute;top:5px;left:0;right:0;text-align:center;font-family:'Press Start 2P',monospace;font-size:8px;color:#10253d}
+.scene:has(.school-art){grid-template-columns:1fr}
+@media(max-width:620px){.pixel-person,.pixel-official{transform:scale(.9)}}
+
+</style>
+</head>
+<body>
+<div class="shell">
+<header>
+  <div class="kicker">ESCAPE ROOM VIRTUAL</div>
+  <h1>EL CÓDIGO DE LA ALFABETIZACIÓN</h1>
+  <div class="subtitle">(1905-1912)</div>
+  <p>Un viaje por la educación, el Estado y el proyecto de país.</p>
+  <div class="pixel">PRESENTA: ANTONELLA FASSIO</div>
+</header>
+<div class="progress" aria-label="Progreso del juego"><div class="dot" id="d1"></div><div class="dot" id="d2"></div><div class="dot" id="d3"></div></div>
+
+<section class="panel active" id="intro">
+<h2>🗝️ Bienvenido/a, jugador/a</h2>
+<div class="scene"><div class="sprite"><div class="pixel-person"><i class="hair"></i><i class="head"></i><i class="eye"></i><i class="body"></i><i class="arm"></i><i class="leg"></i></div></div><div class="speech">Año 1905. Sos Mateo: un joven obrero e hijo de inmigrantes. El Estado Nacional puede perseguirte y disciplinarte, pero también abrirte las puertas de la escuela.</div></div>
+<p class="story">Tu objetivo: superar las 3 salas del sistema para descifrar el “Código de la Emancipación” y descubrir si el conocimiento puede ser una herramienta de control o de libertad.</p>
+<p>Leé cada situación y elegí una opción. No hay que correr: lo importante es pensar y participar.</p>
+<button class="btn" onclick="go('room1')">▶ COMENZAR</button>
+</section>
+
+<section class="panel" id="room1">
+<h2>🚪 SALA 1: El Palacio de la Ley 1420 (Año 1884)</h2>
+<div class="scene"><div class="sprite"><div class="pixel-person book"><i class="hair"></i><i class="head"></i><i class="eye"></i><i class="body"></i><i class="arm"></i><i class="leg"></i></div></div><div class="speech">🏛️ Inspector Escolar<br>«Buscamos formar ciudadanos morales, limpios y patriotas bajo la instrucción obligatoria, gratuita y laica (Art. 2 y 8). Pero no te daremos educación técnica ni industrial; para la élite gobernante están los Colegios Nacionales.»</div></div>
+<p class="story">Entrás al imponente edificio neoclásico de una escuela primaria común. El Estado (encarnado en el Inspector Escolar) te frena en la puerta y te dice: «Buscamos formar ciudadanos morales, limpios y patriotas bajo la instrucción obligatoria, gratuita y laica (Art. 2 y 8). Pero no te daremos educación técnica ni industrial; para la élite gobernante están los Colegios Nacionales.»</p>
+<div class="dilemma"><strong>El dilema de Tedesco:</strong> Descubrís que la escuela no se creó para darte trabajo calificado, sino para controlar políticamente la marea inmigratoria y legitimarse en el poder.</div>
+<h3>🔓 PRUEBA 1 (Elegí tu respuesta)</h3>
+<div class="choices">
+<button class="choice" onclick="choose(1,'A')"><strong>OPCIÓN A</strong>Aceptás la escuela solo como un espacio de moralización y docilidad.</button>
+<button class="choice" onclick="choose(1,'B')"><strong>OPCIÓN B</strong>Aprovechás la laicidad (Art. 8) y la gratuidad para apropiarte de la lectoescritura sin dejarte adoctrinar por el mandato religioso tradicional.</button>
+</div>
+<div class="feedback" id="f1"></div><div class="actions"><button class="btn" id="n1" style="display:none" onclick="go('room2')">CONTINUAR A SALA 2 ▶</button></div>
+</section>
+
+<section class="panel" id="room2">
+<h2>🚪 SALA 2: El Interior Profundo y la Ley Láinez (Año 1905)</h2>
+<div class="scene"><div class="sprite"><div class="school-art"><div class="building"><i class="window"></i><i class="door"></i></div><div class="label">ESCUELA</div></div></div><div class="speech" id="state2">🏛️ Estado Nacional<br>«Las provincias no llegan a todos los rincones. Traigo una escuela, pero también un modelo educativo nacional.»</div></div>
+<p class="story">Viajás a una provincia del interior a trabajar. Descubrís que las provincias están quebradas y no pueden cumplir el <strong>Artículo 5 de la Constitución Nacional</strong>, que las obligaba a garantizar la educación primaria. El analfabetismo supera el 50% y crece el descontento social.</p>
+<p>De pronto, irrumpe el Estado Nacional mediante la <strong>Ley Láinez N.º 4874 (1905)</strong>. El Estado instala escuelas nacionales directamente en las provincias para garantizar un <em>mínimun</em> de 4 años de escolaridad básica.</p>
+<div class="dilemma"><strong>El dilema de Pineau y Puiggrós:</strong> ¿Es una medida democratizadora que lleva la escuela adonde no había nada, o es un centralismo que pasa por encima del federalismo provincial e impone un saber básico y recortado?</div>
+<h3>🔓 PRUEBA 2 (Elegí tu respuesta)</h3>
+<div class="choices">
+<button class="choice" onclick="choose(2,'A')"><strong>OPCIÓN A</strong>Rechazás la Escuela Láinez acusando al Estado de centralista e invasor de las autonomías provinciales (Art. 5 CN).</button>
+<button class="choice" onclick="choose(2,'B')"><strong>OPCIÓN B</strong>Apoyás la llegada de la Escuela Láinez porque, aunque el contenido sea un <em>mínimun</em>, le enseña a leer y escribir a los peones rurales y corta con el monopolio del analfabetismo.</button>
+</div>
+<div class="feedback" id="f2"></div><div class="actions"><button class="btn" id="n2" style="display:none" onclick="go('room3')">CONTINUAR A SALA 3 ▶</button></div>
+</section>
+
+<section class="panel" id="room3">
+<h2>🚪 SALA 3: La Paradoja Democrática (Año 1912)</h2>
+<div class="scene"><div class="sprite"><div class="pixel-person book"><i class="hair"></i><i class="head"></i><i class="eye"></i><i class="body"></i><i class="arm"></i><i class="leg"></i></div></div><div class="speech">🏛️ Estado Nacional<br>«Te enseñé a leer para formar al ciudadano que necesitaba el país. ¿Qué harás ahora con lo que aprendiste?»</div></div>
+<p class="story">Llegamos al desenlace. Pasaron los años. El Estado Oligárquico te alfabetizó para que fueras un sujeto dócil y obediente. Sin embargo, se produjo lo que <strong>Juan Carlos Tedesco y Adriana Puiggrós</strong> llaman <strong>la gran paradoja del sistema educativo argentino</strong>: <strong>la misma herramienta diseñada para controlar terminó democratizando al país.</strong></p>
+<p>Mateo y miles de hijos de inmigrantes leen el diario, se organizan en los sindicatos y partidos políticos emergentes, y exigen el fin del fraude electoral.</p>
+<h3>🔓 PRUEBA FINAL (Conclusión Grupal)</h3>
+<div class="choices">
+<button class="choice" onclick="choose(3,'A')"><strong>OPCIÓN A</strong>El Estado fue el enemigo de Mateo.</button>
+<button class="choice" onclick="choose(3,'B')"><strong>OPCIÓN B</strong>El Estado fue un aliado involuntario de Mateo.</button>
+</div>
+<div class="feedback" id="f3"></div><div class="actions"><button class="btn" id="n3" style="display:none" onclick="go('ending')">DESCIFRAR EL CÓDIGO ▶</button></div>
+</section>
+
+<section class="panel" id="ending">
+<h2>🏆 ¡Llegaste al final!</h2>
+<div class="scene"><div class="sprite"><div class="pixel-person book"><i class="hair"></i><i class="head"></i><i class="eye"></i><i class="body"></i><i class="arm"></i><i class="leg"></i></div></div><div class="speech">Mateo aprendió a leer. Ahora puede interpretar el mundo y decidir qué hacer con esas palabras.</div></div>
+<p class="story"><strong>El Estado te enseñó a leer. Pero no podía decidir por completo qué harías con esas palabras.</strong></p>
+<h3>🔑 El código de la emancipación</h3>
+<p>La misma institución que buscaba formar ciudadanos según un proyecto de país también podía brindar herramientas para cuestionar ese orden.</p>
+<div class="dilemma"><strong>Pregunta para el foro:</strong><br>¿El Estado terminó siendo tu enemigo o tu aliado involuntario? ¿Puede ser ambas cosas al mismo tiempo? Compartí tu reflexión en el foro.</div>
+<button class="btn" onclick="restart()">↻ VOLVER A JUGAR</button>
+</section>
+<footer>🗝️ El código está en tus manos · Escape Room Virtual · 1905–1912</footer>
+</div>
+<script>
+const messages={
+1:{A:"Elegiste adaptarte a las reglas. Mateo entra a la escuela y aprende las normas de conducta que el sistema espera de él. ¿Qué oportunidades y qué límites puede implicar esa adaptación?",B:"Elegiste apropiarte del conocimiento. Mateo aprovecha la gratuidad y la laicidad para aprender a leer y escribir. ¿Puede una herramienta pensada para formar ciudadanos también abrir caminos de autonomía?"},
+2:{A:"Elegiste cuestionar la intervención nacional. Mateo pone en primer plano el federalismo y la autonomía provincial. ¿Cómo se puede equilibrar el respeto por las provincias con el derecho a la educación?",B:"Elegiste apoyar la llegada de la escuela. Mateo accede a la alfabetización, aunque queda abierta la pregunta por los límites del contenido ofrecido. ¿Alcanza con abrir una escuela para garantizar una educación igualitaria?"},
+3:{A:"Tu elección destaca el papel del Estado como instrumento de disciplina y control. Sin embargo, la alfabetización también podía producir efectos que el poder no controlaba por completo.",B:"Tu elección destaca la paradoja: la escuela podía ser una herramienta del proyecto estatal y, a la vez, ofrecer conocimientos para organizarse y cuestionar el orden establecido."}
+};
+function go(id){document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));document.getElementById(id).classList.add('active');window.scrollTo({top:0,behavior:'smooth'});}
+function choose(room,opt){document.getElementById('f'+room).innerHTML='<strong>Tu elección:</strong> '+messages[room][opt]+'<br><span class="small">No hay una única mirada: guardá esta idea para la reflexión final.</span>';document.getElementById('f'+room).classList.add('show');document.getElementById('n'+room).style.display='inline-block';document.getElementById('d'+room).classList.add('done');}
+function restart(){['d1','d2','d3'].forEach(id=>document.getElementById(id).classList.remove('done'));['f1','f2','f3'].forEach(id=>{document.getElementById(id).classList.remove('show');document.getElementById(id).innerHTML='';});['n1','n2','n3'].forEach(id=>document.getElementById(id).style.display='none');go('intro');}
+</script>
+</body>
+</html>
